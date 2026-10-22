@@ -251,8 +251,59 @@ body.bridge-pending #tfConnectOverlay{display:flex}
 .tf-connect-card .tf-note{font-size:12px;color:#8a94a0;margin-top:20px}
 body.sheet-loading main, body.sheet-error main {pointer-events:none;opacity:.63}
 </style>
+<style id="tf-pin-style">
+body.pin-locked{overflow:hidden}
+body.pin-locked #tfPinOverlay{display:flex}
+body.pin-locked #tfConnectOverlay{display:none!important}
+#tfPinOverlay{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;padding:26px;background:radial-gradient(circle at 22% 18%,#fffdfa 0,transparent 48%),linear-gradient(135deg,#f7f5ee,#f0f1f1 68%,#eef1f4);color:#102c50;isolation:isolate}
+#tfPinOverlay:before{content:"";position:absolute;inset:0;opacity:.24;background:repeating-linear-gradient(125deg,transparent 0,transparent 115px,rgba(178,152,101,.12) 116px,transparent 117px);pointer-events:none}
+.tf-pin-mark{position:absolute;inset:auto 0 0 0;pointer-events:none;text-align:center;color:rgba(16,44,80,.036);font:360px/1 Georgia,serif;letter-spacing:-30px;transform:translateY(40%)}
+.tf-pin-shell{width:min(455px,100%);position:relative;background:rgba(255,255,255,.94);border:1px solid rgba(194,204,214,.8);border-radius:26px;padding:37px 40px 34px;text-align:center;box-shadow:0 28px 85px rgba(16,44,80,.11),0 3px 13px rgba(16,44,80,.03);animation:tfPinRise .65s cubic-bezier(.2,.72,.2,1) both}
+@keyframes tfPinRise{from{opacity:0;transform:translateY(17px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+.tf-pin-topline{height:3px;width:45px;border-radius:3px;margin:-13px auto 20px;background:linear-gradient(90deg,#8c7544,#ddc694)}
+#tfPinLogo{width:75px;height:75px;display:block;object-fit:contain;margin:0 auto 14px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.04))}
+.tf-pin-fallback{display:none;font:40px Georgia,serif;color:#b29865;height:75px;line-height:75px;margin-bottom:14px}
+.tf-pin-eyebrow{font-size:10px;font-weight:650;letter-spacing:.24em;color:#aa8d5e;margin:4px 0 13px}
+.tf-pin-shell h2{font:normal 34px/1.15 Georgia,'Times New Roman',serif;margin:0 0 12px;color:#102c50}
+.tf-pin-shell .tf-pin-description{font-size:13px;line-height:1.7;color:#69788b;margin:0 auto 27px;max-width:325px}
+.tf-pin-fields{display:flex;justify-content:center;gap:10px;position:relative;margin:0 0 12px}
+.tf-pin-field{width:56px;height:63px;display:flex;align-items:center;justify-content:center;background:#f9fafb;border:1.5px solid #d9e1e9;border-radius:12px;font:600 23px system-ui,sans-serif;color:#102c50;transition:border .18s,background .18s,box-shadow .18s}
+.tf-pin-field.filled{border-color:#bba171;background:#fcf9f2}.tf-pin-fields:focus-within .tf-pin-field.active{border-color:#b29865;box-shadow:0 0 0 3px rgba(178,152,101,.14);background:white}
+#tfPinInput{position:absolute;inset:0;width:100%;height:100%;opacity:.015;border:0;cursor:text;color:transparent;caret-color:transparent;z-index:2;outline:0}
+#tfPinInput:focus{outline:0}
+.tf-pin-error{color:#af3d4e;min-height:22px;font-size:12px;margin:2px 0 8px}
+.tf-pin-submit{width:100%;margin-top:4px;border:0;border-radius:11px;padding:14px 16px;color:white;background:linear-gradient(115deg,#102c50,#244e77);box-shadow:0 7px 20px rgba(16,44,80,.18);font-weight:650;letter-spacing:.01em;transition:transform .2s,box-shadow .2s}
+.tf-pin-submit:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(16,44,80,.24)}
+.tf-pin-footnote{font-size:11px;margin-top:21px;color:#8b96a5;display:flex;align-items:center;justify-content:center;gap:6px}
+.tf-pin-footnote svg{width:13px;height:13px}
+.tf-pin-fields.shake{animation:tfPinShake .32s linear}
+@keyframes tfPinShake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+body.pin-locked aside,body.pin-locked main,body.pin-locked footer{visibility:hidden}
+body:not(.pin-locked) #tfPinOverlay{display:none}
+@media(max-width:540px){.tf-pin-shell{padding:34px 21px 29px;border-radius:22px}.tf-pin-shell h2{font-size:29px}.tf-pin-field{width:52px;height:60px}#tfPinLogo{width:65px;height:65px}}
+@media(prefers-reduced-motion:reduce){.tf-pin-shell,.tf-pin-fields.shake{animation:none}.tf-pin-submit{transition:none}}
+</style>
 </head>
-<body>
+<body class="pin-locked">
+<div id="tfPinOverlay" role="dialog" aria-modal="true" aria-labelledby="tfPinTitle">
+ <div class="tf-pin-mark" aria-hidden="true">TF</div>
+ <div class="tf-pin-shell">
+  <div class="tf-pin-topline"></div>
+  <img id="tfPinLogo" alt="Logotipo TF" /><div class="tf-pin-fallback" aria-hidden="true">TF</div>
+  <div class="tf-pin-eyebrow">ÁREA ADMINISTRATIVA</div>
+  <h2 id="tfPinTitle">Acesso ao financeiro</h2>
+  <p class="tf-pin-description">Digite seu PIN de quatro dígitos para entrar no painel de pagamentos.</p>
+  <form id="tfPinForm" autocomplete="off">
+   <div class="tf-pin-fields" id="tfPinFields" aria-label="PIN de acesso">
+    <span class="tf-pin-field active" aria-hidden="true"></span><span class="tf-pin-field" aria-hidden="true"></span><span class="tf-pin-field" aria-hidden="true"></span><span class="tf-pin-field" aria-hidden="true"></span>
+    <input id="tfPinInput" type="password" aria-label="PIN de 4 dígitos" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="new-password" required spellcheck="false" />
+   </div>
+   <div id="tfPinError" class="tf-pin-error" role="alert" aria-live="polite"></div>
+   <button class="tf-pin-submit" type="submit">Entrar no painel <span aria-hidden="true">→</span></button>
+  </form>
+  <div class="tf-pin-footnote"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg> Dados financeiros autorizados pela conta Google</div>
+ </div>
+</div>
 <div id="tfConnectOverlay" role="dialog" aria-modal="true" aria-labelledby="tfConnectTitle">
  <div class="tf-connect-card"><div class="tf-icon">🔒</div><h2 id="tfConnectTitle">Conexão privada necessária</h2>
  <p>O painel funciona no GitHub Pages. Os dados são lidos e gravados pelo Google Apps Script, com acesso somente à sua conta Google.</p>
@@ -336,6 +387,36 @@ $('loadreceived').onclick=()=>alert('Os registros serão lidos da planilha quand
  });
 })();
 </script>
+<script id="tf-pin-behavior">
+(function(){
+ const input=document.getElementById('tfPinInput'),form=document.getElementById('tfPinForm');
+ const err=document.getElementById('tfPinError'),fields=[...document.querySelectorAll('.tf-pin-field')];
+ const panel=document.getElementById('tfPinOverlay'),logo=document.getElementById('tfPinLogo');
+ const sourceLogo=document.querySelector('aside .brand img');
+ if(sourceLogo && sourceLogo.src){logo.src=sourceLogo.src}else{logo.style.display='none';panel.querySelector('.tf-pin-fallback').style.display='block'}
+ function redraw(){
+  input.value=input.value.replace(/\D/g,'').slice(0,4);
+  fields.forEach((el,i)=>{el.textContent=i<input.value.length?'●':'';el.classList.toggle('filled',i<input.value.length);el.classList.toggle('active',i===Math.min(input.value.length,3))});
+  err.textContent='';
+ }
+ input.addEventListener('input',redraw);
+ input.addEventListener('paste',()=>setTimeout(redraw,0));
+ panel.addEventListener('click',e=>{if(e.target.closest('.tf-pin-field'))input.focus()});
+ form.addEventListener('submit',e=>{
+  e.preventDefault();
+  if(input.value==='0002'){
+   document.body.classList.remove('pin-locked');
+   input.value='';redraw();
+   if(typeof window.TF_onPinUnlocked==='function')window.TF_onPinUnlocked();
+  }else{
+   err.textContent='PIN incorreto. Tente novamente.';
+   const row=document.getElementById('tfPinFields');row.classList.remove('shake');void row.offsetWidth;row.classList.add('shake');
+   input.value='';redraw();err.textContent='PIN incorreto. Tente novamente.';input.focus();
+  }
+ });
+ setTimeout(()=>input.focus(),90);
+})();
+</script>
 <script>
 /* GitHub Pages ↔ Apps Script: ponte privada por janela autenticada. */
 (function(){
@@ -354,7 +435,7 @@ $('loadreceived').onclick=()=>alert('Os registros serão lidos da planilha quand
  const overlay=document.getElementById('tfConnectOverlay');
  const connectButton=document.getElementById('tfConnectButton');
  let bridgeOrigin=null,bridgeToken=null,connected=false,lastMessageAt=0;
- let openerWindow=null;
+ let openerWindow=null,popupWindow=null,pendingToken=null;
  const pendingRpc=new Map();
  const params=new URLSearchParams(window.location.search);
  const session=params.get('tf_session');
@@ -367,14 +448,38 @@ $('loadreceived').onclick=()=>alert('Os registros serão lidos da planilha quand
  document.body.classList.add('bridge-pending','sheet-loading');
  window.TF_SYNC_ACTIVE=false;
  setState('Google Sheets desconectado','error');
- connectButton.addEventListener('click',()=>{window.location.assign(backendUrl)});
+ window.TF_onPinUnlocked=function(){
+   if(connected)return;
+   const random=crypto.getRandomValues(new Uint8Array(16));
+   pendingToken=Array.from(random,v=>v.toString(16).padStart(2,'0')).join('');
+   const target=new URL(backendUrl);target.searchParams.set('tf_session',pendingToken);
+   popupWindow=window.open(target.href,'tf_google_private_sync','width=650,height=700');
+   document.getElementById('tfBridgeHint').textContent=popupWindow?'Aguardando o Google confirmar a conexão. Se necessário, entre na sua conta Google na janela aberta.':'O navegador bloqueou a janela de autenticação. Permita pop-ups para este site e tente novamente.';
+   connectButton.textContent='Tentar conexão com o Google';
+   connectButton.onclick=()=>{
+      if(!pendingToken){window.TF_onPinUnlocked();return}
+      const t=new URL(backendUrl);t.searchParams.set('tf_session',pendingToken);
+      popupWindow=window.open(t.href,'tf_google_private_sync','width=650,height=700');
+   };
+ };
  const allowedBridgeOrigin=origin=>{
    try{const u=new URL(origin);return u.protocol==='https:'&&(u.hostname==='script.google.com'||u.hostname==='script.googleusercontent.com'||u.hostname.endsWith('.googleusercontent.com'));}catch(e){return false}
  };
  window.addEventListener('message',event=>{
-   if(!openerWindow||event.source!==openerWindow||!allowedBridgeOrigin(event.origin))return;
+   if(!allowedBridgeOrigin(event.origin))return;
    const data=event.data;
-   if(!data||data.tfBridge!=='TF2026-v2'||data.token!==bridgeToken)return;
+   if(!data||data.tfBridge!=='TF2026-v2')return;
+   // Fluxo novo: após o PIN, a janela autenticada do Apps Script se conecta ao GitHub.
+   if(data.type==='hello' && pendingToken && data.token===pendingToken && !connected){
+      openerWindow=event.source;bridgeToken=pendingToken;bridgeOrigin=event.origin;
+      connected=true;lastMessageAt=Date.now();
+      openerWindow.postMessage({tfBridge:'TF2026-v2',token:bridgeToken,type:'ready'},bridgeOrigin);
+      document.body.classList.remove('bridge-pending');
+      setState('Conectando ao Google Sheets…','busy');
+      loadRemote(true);
+      return;
+   }
+   if(!openerWindow||event.source!==openerWindow||data.token!==bridgeToken)return;
    if(data.type==='ready'){
      bridgeOrigin=event.origin;connected=true;lastMessageAt=Date.now();
      document.body.classList.remove('bridge-pending');
@@ -411,7 +516,7 @@ $('loadreceived').onclick=()=>alert('Os registros serão lidos da planilha quand
  document.body.classList.add('sheet-loading');
  setState('Aguardando autenticação privada','error');
  const rpc=(method,arg)=>new Promise((resolve,reject)=>{
-   if(!connected||!openerWindow||openerWindow.closed||!bridgeOrigin)return reject(new Error('Conexão privada perdida. Abra novamente pelo Google Apps Script.'));
+   if(!connected||!openerWindow||(popupWindow&&popupWindow.closed)||!bridgeOrigin)return reject(new Error('Conexão privada perdida. Reabra a janela de autenticação do Google.'));
    const id=crypto.randomUUID ? crypto.randomUUID() : 'rpc-'+Date.now()+'-'+Math.random().toString(36).slice(2);
    const timeout=setTimeout(()=>{if(pendingRpc.has(id)){pendingRpc.delete(id);reject(new Error('O Google Apps Script não respondeu em 45 segundos. Verifique a janela de autenticação.'))}},45000);
    pendingRpc.set(id,{resolve:value=>{clearTimeout(timeout);resolve(value)},reject:error=>{clearTimeout(timeout);reject(error)}});
@@ -517,7 +622,7 @@ $('loadreceived').onclick=()=>alert('Os registros serão lidos da planilha quand
  });
  window.addEventListener('focus',()=>{if(Date.now()-lastSynced>30000)loadRemote(false)});
  setInterval(()=>{
-   if(connected && (!openerWindow||openerWindow.closed)){
+   if(connected && (!openerWindow||(popupWindow&&popupWindow.closed)||(window.opener&&!popupWindow&&window.opener.closed))){
      connected=false;window.TF_SYNC_ACTIVE=false;blocked=true;
      document.body.classList.add('bridge-pending','sheet-loading');
      setState('Sessão encerrada · reconecte','error');
